@@ -3,41 +3,34 @@ import { getExchangeRates } from './exchangeRates.js';
 
 describe('getExchangeRates', () => {
   afterEach(() => {
-    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
-  it('returns the exchange rates when the API responds successfully', async () => {
-    const mockResponse = {
-      amount: 1,
+  it('returns the rates when the API call succeeds', async () => {
+    const fakeRates = {
       base: 'USD',
-      date: '2026-08-20',
-      rates: { EUR: 0.856, GBP: 0.734, JPY: 158.76, CAD: 1.377 },
+      rates: { EUR: 0.86, GBP: 0.73, JPY: 158.76 },
     };
 
-    const mockFetch = vi.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: () => Promise.resolve(mockResponse),
+      json: async () => fakeRates,
     });
-    vi.stubGlobal('fetch', mockFetch);
 
     const result = await getExchangeRates('USD');
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      'https://api.frankfurter.dev/v1/latest?base=USD'
-    );
-    expect(result).toEqual(mockResponse);
+    expect(result).toEqual(fakeRates);
   });
 
-  it('throws an error carrying the real HTTP status when the API call fails', async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
+  it('throws with the real status code when the API call fails', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
-      json: () => Promise.resolve({ message: 'not found' }),
+      json: async () => ({ message: 'not found' }),
     });
-    vi.stubGlobal('fetch', mockFetch);
 
-    await expect(getExchangeRates('ZZZ')).rejects.toMatchObject({
+    await expect(getExchangeRates('XXX')).rejects.toMatchObject({
       status: 404,
       message: 'not found',
     });

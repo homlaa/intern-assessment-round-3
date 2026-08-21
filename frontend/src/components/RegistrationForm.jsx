@@ -3,238 +3,141 @@ import { getExchangeRates } from '../api/exchangeRates.js';
 import { createAttendee } from '../api/attendees.js';
 import './RegistrationForm.css';
 
-const CURRENCIES = [
-  { code: 'USD', name: 'US Dollar' },
-  { code: 'EUR', name: 'Euro' },
-  { code: 'GBP', name: 'British Pound' },
-  { code: 'RWF', name: 'Rwandan Franc' },
-  { code: 'JPY', name: 'Japanese Yen' },
-  { code: 'CAD', name: 'Canadian Dollar' },
-  { code: 'AUD', name: 'Australian Dollar' },
-  { code: 'ZAR', name: 'South African Rand' },
-];
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'RWF', 'JPY', 'CAD', 'AUD', 'ZAR'];
 
-// Deliberately invalid so the second Frankfurter call is guaranteed to fail,
-// per the troubleshooting requirement.
-const INVALID_DEMO_CODE = 'XXX';
-
-const EMPTY_FORM = {
-  firstName: '',
-  lastName: '',
-  birthdate: '',
-  homeCurrency: '',
-};
-
-function validate(form) {
-  const errors = {};
-  if (!form.firstName.trim()) errors.firstName = 'First name is required.';
-  if (!form.lastName.trim()) errors.lastName = 'Last name is required.';
-  if (!form.birthdate) errors.birthdate = 'Birthdate is required.';
-  else if (new Date(form.birthdate) > new Date()) errors.birthdate = 'Birthdate cannot be in the future.';
-  if (!form.homeCurrency) errors.homeCurrency = 'Home currency is required.';
-  return errors;
-}
-
-export default function RegistrationForm() {
-  const [form, setForm] = useState(EMPTY_FORM);
+function RegistrationForm() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthdate, setBirthdate] = useState('');
+  const [currency, setCurrency] = useState('');
   const [errors, setErrors] = useState({});
 
   const [rates, setRates] = useState(null);
-  const [ratesLoading, setRatesLoading] = useState(false);
-  const [ratesError, setRatesError] = useState(null);
+  const [ratesError, setRatesError] = useState('');
 
-  const [demoResult, setDemoResult] = useState(null);
-  const [demoError, setDemoError] = useState(null);
+  const [invalidCallResult, setInvalidCallResult] = useState('');
 
-  const [saveState, setSaveState] = useState({ status: 'idle', message: '' });
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (!form.homeCurrency) {
+    if (!currency) {
       setRates(null);
-      setRatesError(null);
-      setDemoResult(null);
-      setDemoError(null);
+      setRatesError('');
+      setInvalidCallResult('');
       return;
     }
 
-    let cancelled = false;
-
     async function loadRates() {
-      setRatesLoading(true);
-      setRatesError(null);
-      setRates(null);
       try {
-        const data = await getExchangeRates(form.homeCurrency);
-        if (!cancelled) setRates(data);
+        const data = await getExchangeRates(currency);
+        setRates(data);
+        setRatesError('');
       } catch (err) {
-        if (!cancelled) setRatesError(err);
-      } finally {
-        if (!cancelled) setRatesLoading(false);
+        setRates(null);
+        setRatesError(err.message);
       }
     }
 
-    // Troubleshooting: run a second, deliberately invalid call alongside the
-    // real one so both the success and failure paths are demonstrated.
-    async function loadInvalidDemo() {
-      setDemoResult(null);
-      setDemoError(null);
+    async function loadInvalidRates() {
       try {
-        const data = await getExchangeRates(INVALID_DEMO_CODE);
-        if (!cancelled) setDemoResult(data);
+        await getExchangeRates('XXX');
+        setInvalidCallResult('this should not have worked');
       } catch (err) {
-        if (!cancelled) setDemoError(err);
+        setInvalidCallResult(`failed as expected - status ${err.status}: ${err.message}`);
       }
     }
 
     loadRates();
-    loadInvalidDemo();
+    loadInvalidRates();
+  }, [currency]);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [form.homeCurrency]);
+  function validate() {
+    const newErrors = {};
 
-  function handleChange(field) {
-    return (event) => {
-      setForm((prev) => ({ ...prev, [field]: event.target.value }));
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-      setSaveState({ status: 'idle', message: '' });
-    };
+    if (!firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!birthdate) newErrors.birthdate = 'Birthdate is required';
+    if (!currency) newErrors.currency = 'Home currency is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   }
 
-  function handleClear() {
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setRates(null);
-    setRatesError(null);
-    setDemoResult(null);
-    setDemoError(null);
-    setSaveState({ status: 'idle', message: '' });
-  }
+  async function handleSave(e) {
+    e.preventDefault();
+    setMessage('');
 
-  async function handleSave(event) {
-    event.preventDefault();
-    const validationErrors = validate(form);
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    if (!validate()) return;
 
-    setSaveState({ status: 'saving', message: '' });
     try {
-      const attendee = await createAttendee({
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        birthdate: form.birthdate,
-        currencyCode: form.homeCurrency,
-      });
-      setSaveState({
-        status: 'success',
-        message: `Saved! ${attendee.first_name} ${attendee.last_name} registered with ${attendee.currency_name} (${attendee.currency_code}).`,
-      });
+      const saved = await createAttendee({ firstName, lastName, birthdate, currencyCode: currency });
+      setMessage(`Saved ${saved.first_name} ${saved.last_name} with ${saved.currency_name} (${saved.currency_code})`);
     } catch (err) {
-      setSaveState({
-        status: 'error',
-        message: err.status ? `Save failed (HTTP ${err.status}): ${err.message}` : `Save failed: ${err.message}`,
-      });
+      setMessage(`Error: ${err.message}`);
     }
   }
 
-  const displayedRates = rates?.rates ? Object.entries(rates.rates).slice(0, 4) : [];
+  function handleClear() {
+    setFirstName('');
+    setLastName('');
+    setBirthdate('');
+    setCurrency('');
+    setErrors({});
+    setRates(null);
+    setRatesError('');
+    setInvalidCallResult('');
+    setMessage('');
+  }
 
   return (
-    <form className="registration-form" onSubmit={handleSave} noValidate>
+    <form className="registration-form" onSubmit={handleSave}>
       <h1>Attendee Registration</h1>
 
-      <div className="field">
-        <label htmlFor="firstName">First Name</label>
-        <input
-          id="firstName"
-          type="text"
-          value={form.firstName}
-          onChange={handleChange('firstName')}
-        />
-        {errors.firstName && <span className="error">{errors.firstName}</span>}
-      </div>
+      <label htmlFor="firstName">First Name</label>
+      <input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+      {errors.firstName && <p className="error">{errors.firstName}</p>}
 
-      <div className="field">
-        <label htmlFor="lastName">Last Name</label>
-        <input
-          id="lastName"
-          type="text"
-          value={form.lastName}
-          onChange={handleChange('lastName')}
-        />
-        {errors.lastName && <span className="error">{errors.lastName}</span>}
-      </div>
+      <label htmlFor="lastName">Last Name</label>
+      <input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+      {errors.lastName && <p className="error">{errors.lastName}</p>}
 
-      <div className="field">
-        <label htmlFor="birthdate">Birthdate</label>
-        <input
-          id="birthdate"
-          type="date"
-          value={form.birthdate}
-          onChange={handleChange('birthdate')}
-        />
-        {errors.birthdate && <span className="error">{errors.birthdate}</span>}
-      </div>
+      <label htmlFor="birthdate">Birthdate</label>
+      <input id="birthdate" type="date" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+      {errors.birthdate && <p className="error">{errors.birthdate}</p>}
 
-      <div className="field">
-        <label htmlFor="homeCurrency">Home Currency</label>
-        <select
-          id="homeCurrency"
-          value={form.homeCurrency}
-          onChange={handleChange('homeCurrency')}
-        >
-          <option value="">Select a currency</option>
-          {CURRENCIES.map((currency) => (
-            <option key={currency.code} value={currency.code}>
-              {currency.code} - {currency.name}
-            </option>
-          ))}
-        </select>
-        {errors.homeCurrency && <span className="error">{errors.homeCurrency}</span>}
-      </div>
+      <label htmlFor="currency">Home Currency</label>
+      <select id="currency" value={currency} onChange={(e) => setCurrency(e.target.value)}>
+        <option value="">-- select a currency --</option>
+        {CURRENCIES.map((code) => (
+          <option key={code} value={code}>{code}</option>
+        ))}
+      </select>
+      {errors.currency && <p className="error">{errors.currency}</p>}
 
-      {form.homeCurrency && (
-        <div className="rates-panel">
-          <h2>Exchange rates (base: {form.homeCurrency})</h2>
-          {ratesLoading && <p>Loading rates...</p>}
-          {ratesError && (
-            <p className="error">
-              Failed to load rates{ratesError.status ? ` (HTTP ${ratesError.status})` : ''}: {ratesError.message}
-            </p>
-          )}
-          {!ratesLoading && !ratesError && displayedRates.length > 0 && (
+      {currency && (
+        <div className="rates-box">
+          <h3>Exchange rates for {currency}</h3>
+          {ratesError && <p className="error">Could not load rates: {ratesError}</p>}
+          {rates && (
             <ul>
-              {displayedRates.map(([code, value]) => (
-                <li key={code}>
-                  1 {form.homeCurrency} = {value} {code}
-                </li>
+              {Object.entries(rates.rates).slice(0, 4).map(([code, value]) => (
+                <li key={code}>1 {currency} = {value} {code}</li>
               ))}
             </ul>
           )}
 
-          <h3>Troubleshooting demo (calling "{INVALID_DEMO_CODE}")</h3>
-          {demoError && (
-            <p className="error">
-              Real HTTP status from response: {demoError.status} - {demoError.message}
-            </p>
-          )}
-          {demoResult && <p>Unexpectedly succeeded: {JSON.stringify(demoResult)}</p>}
+          <p className="invalid-demo">Invalid currency test (code "XXX"): {invalidCallResult}</p>
         </div>
       )}
 
-      <div className="actions">
-        <button type="submit" disabled={saveState.status === 'saving'}>
-          {saveState.status === 'saving' ? 'Saving...' : 'Save'}
-        </button>
-        <button type="button" onClick={handleClear}>
-          Clear
-        </button>
+      <div className="buttons">
+        <button type="submit">Save</button>
+        <button type="button" onClick={handleClear}>Clear</button>
       </div>
 
-      {saveState.status !== 'idle' && (
-        <p className={saveState.status === 'error' ? 'error' : 'success'}>{saveState.message}</p>
-      )}
+      {message && <p>{message}</p>}
     </form>
   );
 }
+
+export default RegistrationForm;
