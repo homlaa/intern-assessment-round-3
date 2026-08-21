@@ -83,4 +83,8 @@ app.patch("/api/attendees/:id", async (req, res) => {
   res.json(result);
 });
 
+app.get("/", (req, res) => {
+  res.json({ message: "Server is running.", endpoints: ["POST /api/attendees", "PATCH /api/attendees/:id"] });
+});
+
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));
