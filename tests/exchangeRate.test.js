@@ -15,7 +15,7 @@ describe("fetchRates", () => {
   test("returns rates on a successful response", async () => {
     const mockData = {
       base: "USD",
-      rates: { EUR: 0.92, GBP: 0.79, RWF: 1320.5, JPY: 149.3 },
+      rates: { EUR: 0.92, GBP: 0.79, JPY: 149.3, CAD: 1.36 },
     };
 
     fetch.mockResolvedValue({

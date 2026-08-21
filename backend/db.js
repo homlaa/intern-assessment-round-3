@@ -1,8 +1,9 @@
+require("dotenv").config();
 const initSqlJs = require("sql.js");
 const fs = require("fs");
 const path = require("path");
 
-const DB_PATH = path.join(__dirname, "attendees.db");
+const DB_PATH = path.resolve(__dirname, process.env.DB_PATH || "./attendees.db");
 
 let db;
 
