@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h2>Register</h2>
+      <form id="registrationForm" novalidate>
+        <div class="field">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" placeholder="First name" />
+        </div>
+        <div class="field">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" placeholder="Last name" />
+        </div>
+        <div class="field">
+          <label for="birthdate">Birthdate</label>
+          <input type="date" id="birthdate" />
+        </div>
+        <div class="field">
+          <label for="currency">Home Currency</label>
+          <select id="currency">
+            <option value="">-- Select currency --</option>
+            <option value="USD">USD — US Dollar</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="GBP">GBP — British Pound</option>
+            <option value="RWF">RWF — Rwandan Franc</option>
+            <option value="JPY">JPY — Japanese Yen</option>
+            <option value="CAD">CAD — Canadian Dollar</option>
+          </select>
+        </div>
+
+        <div id="ratesSection" class="rates-section hidden">
+          <h4>Exchange Rates (base: <span id="baseLabel"></span>)</h4>
+          <ul id="ratesList"></ul>
+        </div>
+
+        <div id="errorBox" class="error-box hidden"></div>
+
+        <div class="actions">
+          <button type="submit">Save</button>
+          <button type="button" id="clearBtn">Clear</button>
+        </div>
+      </form>
+
+      <div id="successBox" class="success-box hidden"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

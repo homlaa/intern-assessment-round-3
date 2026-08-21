@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-bottom: 24px;
+  font-size: 1.4rem;
+  color: #1a1a2e;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+input,
+select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus {
+  border-color: #4f46e5;
+}
+
+.rates-section {
+  background: #f8f9ff;
+  border: 1px solid #e0e0ff;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.rates-section h4 {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.rates-section ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rates-section ul li {
+  background: #4f46e5;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button[type="submit"] {
+  background: #4f46e5;
+  color: #fff;
+}
+
+button[type="submit"]:hover {
+  background: #4338ca;
+}
+
+button[type="button"] {
+  background: #e5e7eb;
+  color: #333;
+}
+
+button[type="button"]:hover {
+  background: #d1d5db;
+}
+
+.error-box {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  margin-bottom: 12px;
+}
+
+.success-box {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  margin-top: 16px;
+}
+
+.hidden {
+  display: none;
+}
