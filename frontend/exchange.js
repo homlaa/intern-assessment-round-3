@@ -6,3 +6,5 @@ async function fetchRates(currencyCode, fetchImplementation = fetch) {
 }
 
 if (typeof module !== 'undefined') module.exports = { fetchRates };
+
+asycn funtion 
