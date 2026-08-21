@@ -29,8 +29,28 @@
 
             <br>
             <br>
-            <button type = "submit"> Submit </button> 
+            <button type = "submit" id = "save-button"> Save </button> 
             <button type = "reset"> Reset </button>
         </form>
+
+        <script>
+            //add action to validate the form data according to regex rules
+
+            let baseCurrency = document.getElementById("home currency").value;
+            baseCurrency.addEventListener("change", function() {
+                baseCurrency = this.value;
+                async function fetchExchangeRates(baseCurrency) {
+                    try {
+                        let response = await fetch(`https://api.frankfurter.dev/v1/latest?base={baseCurrency}`);
+                        let data = await response.json();
+                        alert(`Exchange rates for ${baseCurrency}: ${JSON.stringify(data.rates)}`);
+
+                    }
+                    catch (error) {
+                        console.error("Error fetching exchange rates:", error);
+                    }
+                }
+            })
+        </script>
     </body>
 </html>
