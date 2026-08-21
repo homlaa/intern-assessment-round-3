@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendee Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Attendee Registration</h1>
+
+        <form id="registrationForm">
+
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Enter your first name"
+                >
+                <small class="error" id="firstNameError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Enter your last name"
+                >
+                <small class="error" id="lastNameError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="birthdate">Birthdate</label>
+                <input
+                    type="date"
+                    id="birthdate"
+                    name="birthdate"
+                >
+                <small class="error" id="birthdateError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="currency">Home Currency</label>
+
+                <select id="currency" name="currency">
+                    <option value="">-- Select Currency --</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="RWF">RWF - Rwandan Franc</option>
+                    <option value="KES">KES - Kenyan Shilling</option>
+                    <option value="TZS">TZS - Tanzanian Shilling</option>
+                    <option value="UGX">UGX - Ugandan Shilling</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="JPY">JPY - Japanese Yen</option>
+                </select>
+
+                <small class="error" id="currencyError"></small>
+            </div>
+
+            <div id="ratesSection" class="rates-section">
+                <h2>Exchange Rates</h2>
+                <p id="ratesMessage">Select a currency to see exchange rates.</p>
+                <div id="rates"></div>
+            </div>
+
+            <div id="apiError" class="api-error"></div>
+
+            <div class="buttons">
+                <button type="submit" id="saveButton">Save</button>
+                <button type="button" id="clearButton">Clear</button>
+            </div>
+
+            <div id="formMessage"></div>
+
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
