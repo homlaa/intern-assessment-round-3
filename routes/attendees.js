@@ -1,17 +1,33 @@
-import express from 'express';
+import express from "express";
 
 export function createAttendeesRouter(db) {
   const router = express.Router();
 
+  // Handle OPTIONS preflight requests
+  router.options("/", (req, res) => {
+    res.sendStatus(200);
+  });
+
+  router.options("/:id", (req, res) => {
+    res.sendStatus(200);
+  });
+
   // POST /api/attendees - Create a new attendee with personal info and currency
-  router.post('/', async (req, res) => {
+  router.post("/", async (req, res) => {
     try {
-      const { firstName, lastName, birthDate, currencyCode, currencyName } = req.body;
+      const { firstName, lastName, birthDate, currencyCode, currencyName } =
+        req.body;
 
       // Validate required fields
-      if (!firstName || !lastName || !birthDate || !currencyCode || !currencyName) {
-        return res.status(400).json({ 
-          error: 'All fields are required' 
+      if (
+        !firstName ||
+        !lastName ||
+        !birthDate ||
+        !currencyCode ||
+        !currencyName
+      ) {
+        return res.status(400).json({
+          error: "All fields are required",
         });
       }
 
@@ -19,7 +35,7 @@ export function createAttendeesRouter(db) {
       const personalResult = await db.run(
         `INSERT INTO personal_information (firstName, lastName, birthDate) 
          VALUES (?, ?, ?)`,
-        [firstName, lastName, birthDate]
+        [firstName, lastName, birthDate],
       );
 
       const attendeeId = personalResult.lastID;
@@ -28,7 +44,7 @@ export function createAttendeesRouter(db) {
       await db.run(
         `INSERT INTO currency_information (attendeeId, currencyCode, currencyName) 
          VALUES (?, ?, ?)`,
-        [attendeeId, currencyCode, currencyName]
+        [attendeeId, currencyCode, currencyName],
       );
 
       // Return the created attendee with JOIN query
@@ -43,46 +59,46 @@ export function createAttendeesRouter(db) {
          FROM personal_information p
          LEFT JOIN currency_information c ON p.id = c.attendeeId
          WHERE p.id = ?`,
-        [attendeeId]
+        [attendeeId],
       );
 
       res.status(201).json({
-        message: 'Attendee created successfully',
-        data: attendee
+        message: "Attendee created successfully",
+        data: attendee,
       });
     } catch (error) {
-      console.error('Error creating attendee:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error("Error creating attendee:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
   // PATCH /api/attendees/:id - Update attendee's currency choice
-  router.patch('/:id', async (req, res) => {
+  router.patch("/:id", async (req, res) => {
     try {
       const { id } = req.params;
       const { currencyCode, currencyName } = req.body;
 
       // Validate required fields
       if (!currencyCode || !currencyName) {
-        return res.status(400).json({ 
-          error: 'Currency code and name are required' 
+        return res.status(400).json({
+          error: "Currency code and name are required",
         });
       }
 
       // Check if attendee exists
       const attendee = await db.get(
         `SELECT id FROM personal_information WHERE id = ?`,
-        [id]
+        [id],
       );
 
       if (!attendee) {
-        return res.status(404).json({ error: 'Attendee not found' });
+        return res.status(404).json({ error: "Attendee not found" });
       }
 
       // Update or insert currency information
       const existingCurrency = await db.get(
         `SELECT id FROM currency_information WHERE attendeeId = ?`,
-        [id]
+        [id],
       );
 
       if (existingCurrency) {
@@ -90,13 +106,13 @@ export function createAttendeesRouter(db) {
           `UPDATE currency_information 
            SET currencyCode = ?, currencyName = ?, updatedAt = CURRENT_TIMESTAMP
            WHERE attendeeId = ?`,
-          [currencyCode, currencyName, id]
+          [currencyCode, currencyName, id],
         );
       } else {
         await db.run(
           `INSERT INTO currency_information (attendeeId, currencyCode, currencyName) 
            VALUES (?, ?, ?)`,
-          [id, currencyCode, currencyName]
+          [id, currencyCode, currencyName],
         );
       }
 
@@ -112,16 +128,16 @@ export function createAttendeesRouter(db) {
          FROM personal_information p
          LEFT JOIN currency_information c ON p.id = c.attendeeId
          WHERE p.id = ?`,
-        [id]
+        [id],
       );
 
       res.status(200).json({
-        message: 'Attendee updated successfully',
-        data: updatedAttendee
+        message: "Attendee updated successfully",
+        data: updatedAttendee,
       });
     } catch (error) {
-      console.error('Error updating attendee:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error("Error updating attendee:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
