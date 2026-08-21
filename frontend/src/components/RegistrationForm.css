@@ -1,0 +1,48 @@
+.registration-form {
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field input,
+.field select {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.error {
+  color: #d33;
+  font-size: 0.875rem;
+}
+
+.success {
+  color: #2a8f4f;
+  font-size: 0.9rem;
+}
+
+.rates-panel {
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rates-panel ul {
+  padding-left: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+}
