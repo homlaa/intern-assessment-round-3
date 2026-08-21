@@ -1,4 +1,5 @@
 # Intern Assessment — Round 3
 
 ## Progress
-_No entries yet._
+
+Started by Tracy, Round 3.

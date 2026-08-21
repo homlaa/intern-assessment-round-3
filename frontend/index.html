@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attendee registration</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="intro">
+        <p class="eyebrow">ROUND 03 / REGISTRATION</p>
+        <h1>Make a place<br />at the table.</h1>
+        <p class="lede">
+          Save attendee details and see a live snapshot of the currencies moving
+          through the room.
+        </p>
+        <div class="status-mark"><span></span> Connected to Frankfurter</div>
+      </section>
+      <section class="panel">
+        <form id="registration-form" novalidate>
+          <div class="form-heading">
+            <p class="eyebrow">NEW ATTENDEE</p>
+            <h2>Registration details</h2>
+          </div>
+          <div class="field-grid">
+            <label
+              >First Name<input
+                name="firstName"
+                autocomplete="given-name"
+                required
+            /></label>
+            <label
+              >Last Name<input
+                name="lastName"
+                autocomplete="family-name"
+                required
+            /></label>
+          </div>
+          <label
+            >Birthdate<input type="date" name="birthdate" required
+          /></label>
+          <label
+            >Home Currency<select name="currencyCode" id="currency" required>
+              <option value="">Choose a currency</option>
+              <option>USD</option>
+              <option>EUR</option>
+              <option>GBP</option>
+              <option>RWF</option>
+              <option>CAD</option>
+              <option>AUD</option>
+              <option>JPY</option>
+              <option>CHF</option>
+            </select></label
+          >
+          <p id="form-message" class="message" role="status"></p>
+          <div class="actions">
+            <button type="button" class="secondary" id="clear">Clear</button
+            ><button type="submit" class="primary">
+              Save attendee <span>→</span>
+            </button>
+          </div>
+        </form>
+        <section class="rates" aria-live="polite">
+          <div class="rates-heading">
+            <div>
+              <p class="eyebrow">MARKET CHECK</p>
+              <h2>Exchange rates</h2>
+            </div>
+            <span id="base-label">—</span>
+          </div>
+          <div id="rate-list" class="rate-list">
+            <p class="empty">Choose a currency to load the latest rates.</p>
+          </div>
+          <p id="error-status" class="error"></p>
+        </section>
+      </section>
+    </main>
+    <script src="exchange.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
